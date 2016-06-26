@@ -7,10 +7,11 @@ CONSUMER_SECRET = "enter your secret consumer key here"
 ACCESS_TOKEN = "enter your access token here"
 ACCESS_TOKEN_SECRET = "enter your secret access token here"
 
-# the path to the file containing the json objects of the collected tweets
-# the raw data, essentially
-DATA_PATH = "~/path/to/raw/data.json"
+# The path to the file containing the json objects of the collected tweets
+# The raw data, essentially
+RAW_DATA_PATH = "~/path/to/raw/data.json"
+# The path to the csv file containing the score, etc.
+PROCESSED_DATA_PATH = "~/path/to/processed/data.csv"
 
 # The path to the file containing the user ids of the accounts to be analyzed
-# The file has to be a csv file
-USER_IDS_PATH = "~/path/to/user/ids.csv"
+USER_IDS_PATH = "~/path/to/user/ids.txt"
