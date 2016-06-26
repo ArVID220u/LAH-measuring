@@ -1,5 +1,5 @@
 *.pyc
-apikeys.py
+setup.py
 __pycache__
 *.bak
 
