@@ -7,6 +7,12 @@ TWITTER_USERNAME = "screen name"
 
 
 
+# FINDING USERS
+
+# The number of users to find. For a single tweeting bot, something like 1000 users is suitable.
+NUMBER_OF_USERS = 1000
+
+
 # TWEETING
 
 # The tweet with which to always reply to users who mention the bot
