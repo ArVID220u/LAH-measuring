@@ -102,8 +102,8 @@ class SentimentAnalyzer():
         best_match = prob_object.max()
         # best match probability
         best_match_prob = prob_object.prob(best_match)
-        # have a 50 % threshold in place
-        if best_match_prob < 0.50:
+        # have a 20 % threshold in place
+        if best_match_prob < 0.2:
             print("classification failed – returning neutral value")
             return 0
         if best_match == "hateful":
