@@ -1,2 +1,2 @@
-# LAH-measuring
-Measuring the frequency of offensive tweets, in a predetermined group of Twitter users.
+# LoveAgainstHate
+Combats hate with love. Also measuring the effectiveness of the treatment.
