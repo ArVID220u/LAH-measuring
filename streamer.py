@@ -13,6 +13,9 @@ class TweetStreamer(TwythonStreamer):
     # Simple label to know from where the tweet streamer was called
     error_title = "placeholder"
 
+    # Normally, retweets should be excluded
+    exclude_retweets = True
+
     new_tweet_observers = []
 
     def add_observer(self, observer):
@@ -20,6 +23,14 @@ class TweetStreamer(TwythonStreamer):
 
     # this function will be called when a tweet is received
     def on_success(self, data):
+        if "text" not in data:
+            return
+        if self.exclude_retweets:
+            # filter out retweets
+            if data["text"].startswith("RT"):
+                return
+            if "retweeted_status" in data:
+                return
         # send tweet to the specified delegate function
         # self.new_tweet needs to be set
         for observer in self.new_tweet_observers:
