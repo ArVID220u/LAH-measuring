@@ -9,18 +9,25 @@ import setup
 # import the sentiment database
 import sentiment_database
 # import the streamer
-import streamer
-
+from streamer import TweetStreamer
+# import random
+import random
 
 # Initialize a streamer, and set the callback to sentiment_database's add_tweet
 def main():
     # use the tweeting app
     streamer = TweetStreamer(setup.TWEETING_CONSUMER_KEY, setup.TWEETING_CONSUMER_SECRET, setup.TWEETING_ACCESS_TOKEN, setup.TWEETING_ACCESS_TOKEN_SECRET)
     # add the observer
-    streamer.add_observer(sentiment_database.add_tweet)
+    streamer.add_observer(get_tweet)
     # start streaming
     streamer.statuses.filter(track=setup.SEARCH_PHRASE, language=setup.LANGUAGE)
 
+def get_tweet(tweet):
+    if tweet["entities"]["urls"]:
+        return
+    if "you" not in tweet["text"]:
+        return
+    sentiment_database.add_tweet(tweet)
 
 
 # if called directly (as in "python3 mainbot.py"), then call main() function
