@@ -24,23 +24,21 @@ def get_tweets(version):
 # add tweets
 # this function gets a tweet dictionary, and asks the comand line interface whether
 # the tweet should be added to the abusive list or the nonabusive list
-def add_tweet(tweet, replied_tweet):
-    # print the text, and prompt the user for either "a" which corresponds to abusive
-    # or "s", which corresponds to nonabusive
-    print("@" + replied_tweet["user"]["screen_name"] + ": " + replied_tweet["text"])
+def add_tweet(tweet):
+    # print text, and prompt user to evaluate whether hateful, kind or neutral
     print("@" + tweet["user"]["screen_name"] + ": " + tweet["text"])
     ans = input()
-    while ans != "ä" and ans != "ö" and ans != "å":
-        print("type 'ä' if the tweet is hateful, 'ö' if the tweet is kind, and 'å' if neutral")
+    while ans != "a" and ans != "s" and ans != "d":
+        print("type 'a' if the tweet is hateful, 'd' if the tweet is kind, and 's' if neutral")
         ans = input()
-    if ans == "ä":
+    if ans == "a":
         # save the tweet to the abusive file
         save_tweet(tweet, "hateful")
         print("hateful")
-    elif ans == "ö":
+    elif ans == "d":
         save_tweet(tweet, "kind")
         print("kind")
-    elif ans == "å":
+    elif ans == "s":
         save_tweet(tweet, "neutral")
         print("neutral")
 
