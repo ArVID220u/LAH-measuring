@@ -51,7 +51,7 @@ LANGUAGE = "en"
 # Note: the search phrase should be formatted according to Twitter guidelines,
 # e.g. with space for AND search and comma for OR search
 # Inspiration from http://femfreq.tumblr.com/post/109319269825/one-week-of-harassment-on-twitter
-SEARCH_PHRASE = "cunt,kill yourself,shut the fuck up,bitch,whore,fuck you,stupid,fuck,shit,love"
+SEARCH_PHRASE = "cunt,kill yourself,shut the fuck up"
 
 
 
