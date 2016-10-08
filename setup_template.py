@@ -40,6 +40,21 @@ USER_IDS_PATH = "user_ids.txt"
 
 
 
+# TECHNICAL
+
+# The language of all tweets. Setting this does not automatically translate the responses.txt
+LANGUAGE = "en"
+
+# The search phrase is used in both training and finding users
+# Thus, it should (1) be quite broad, and (2) somewhat single out offensive tweeters
+# The balance between (1) and (2) is of essence.
+# Note: the search phrase should be formatted according to Twitter guidelines,
+# e.g. with space for AND search and comma for OR search
+# Inspiration from http://femfreq.tumblr.com/post/109319269825/one-week-of-harassment-on-twitter
+SEARCH_PHRASE = "cunt,kill yourself,shut the fuck up,bitch,whore,fuck you,stupid,fuck,shit,love"
+
+
+
 # API KEYS
 
 # Keys for the Tweeting bot. Needs read and write privileges.
