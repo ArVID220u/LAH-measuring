@@ -28,8 +28,8 @@ def add_tweet(tweet):
     # print text, and prompt user to evaluate whether hateful, kind or neutral
     print("@" + tweet["user"]["screen_name"] + ": " + tweet["text"])
     ans = input()
-    while ans != "a" and ans != "s" and ans != "d":
-        print("type 'a' if the tweet is hateful, 'd' if the tweet is kind, and 's' if neutral")
+    while ans != "a" and ans != "s" and ans != "d" and ans != "h":
+        print("type 'a' if the tweet is hateful, 'd' if the tweet is kind, and 's' if neutral. if the tweet is impossible to categorize, skip it with 'h'")
         ans = input()
     if ans == "a":
         # save the tweet to the abusive file
@@ -41,6 +41,7 @@ def add_tweet(tweet):
     elif ans == "s":
         save_tweet(tweet, "neutral")
         print("neutral")
+
 
 
 # save the tweet's text and its id to the corresponding file

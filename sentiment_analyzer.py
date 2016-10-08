@@ -109,10 +109,10 @@ class SentimentAnalyzer():
         if best_match == "hateful":
             print("classified as hateful")
             return -1
-        else if best_match == "neutral":
+        elif best_match == "neutral":
             print("classified as neutral")
             return 0
-        else if best_match == "kind":
+        elif best_match == "kind":
             print("classified as kind")
             return 1
         else:
