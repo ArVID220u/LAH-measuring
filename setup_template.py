@@ -9,7 +9,7 @@ TWITTER_USERNAME = "screen name"
 
 # FINDING USERS
 
-# The number of users to find. For a single tweeting bot, something like 1000 users is suitable.
+# The number of users to find. For a single tweeting bot, something like 1000 users is appropriate.
 NUMBER_OF_USERS = 1000
 
 
