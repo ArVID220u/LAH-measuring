@@ -12,6 +12,8 @@ import sentiment_database
 from streamer import TweetStreamer
 # import random
 import random
+# for the pairwise thing
+from itertools import tee
 
 # Initialize a streamer, and set the callback to sentiment_database's add_tweet
 def main():
@@ -21,6 +23,21 @@ def main():
     streamer.add_observer(get_tweet)
     # start streaming
     streamer.statuses.filter(track=setup.SEARCH_PHRASE, language=setup.LANGUAGE)
+
+def pairwise(iterable):
+    a, b = tee(iterable)
+    next(b, None)
+    return zip(a, b)
+def grouped(iterable):
+    return zip(*[iter(iterable)]*2)
+
+def BYB():
+    with open("BYBnonabusivetweets.txt", "r") as f:
+        x = f.read().split("%BOTYOURBACK||SPLIT%")
+        x.pop()
+        for a, b in grouped(x):
+            i = {"text": a, "user": {"screen_name": b}, "id": b}
+            sentiment_database.add_tweet(i)
 
 def get_tweet(tweet):
     if tweet["entities"]["urls"]:
@@ -32,4 +49,5 @@ def get_tweet(tweet):
 
 # if called directly (as in "python3 mainbot.py"), then call main() function
 if __name__ == "__main__":
-    main()
+    #main()
+    BYB()
