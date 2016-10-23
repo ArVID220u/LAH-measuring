@@ -45,13 +45,16 @@ USER_IDS_PATH = "user_ids.txt"
 # The language of all tweets. Setting this does not automatically translate the responses.txt
 LANGUAGE = "en"
 
-# The search phrase is used in both training and finding users
+# The search phrase is used in finding users
 # Thus, it should (1) be quite broad, and (2) somewhat single out offensive tweeters
 # The balance between (1) and (2) is of essence.
 # Note: the search phrase should be formatted according to Twitter guidelines,
 # e.g. with space for AND search and comma for OR search
 # Inspiration from http://femfreq.tumblr.com/post/109319269825/one-week-of-harassment-on-twitter
-SEARCH_PHRASE = "cunt,kill yourself,shut the fuck up"
+SEARCH_PHRASE = "cunt,kill yourself,shut the fuck up,and"
+# The phrase to find tweets for training
+# Since training is done by a human being, and since humans are inherently slow, this phrase needs to be more constrained
+TRAIN_PHRASE = "cunt,kill yourself,shut the fuck up"
 
 
 
