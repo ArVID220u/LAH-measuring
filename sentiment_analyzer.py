@@ -2,6 +2,8 @@
 import nltk
 # import the sentiment_database for the training
 import sentiment_database
+# import the error messenger
+import error_messenger
 
 # this class has one important method: analyze_tweet, which either returns -1, 0 or 1, each representing different sentiments
 # -1 = hatefulness, 0 = neutrality, 1 = kindness
@@ -90,31 +92,58 @@ class SentimentAnalyzer():
 
 
 
-    # returns an int belonging to {-1, 0, 1} indicating whether the string provided is classified as hateful, neutral or kind
-    # this is the most important function
-    def analyze_tweet(self, tweet):
+
+    # a set of the legal classifications
+    # that is: hateful, neutral, kind
+    legal_classifications = {"hateful", "neutral", "kind"}
+
+
+    # returns a probability distribution for the three classifications (hateful, neutral and kind)
+    # the return type is a dictionary, with keys belonging to {-1, 0, 1} (hateful, neutral, kind respectively),
+    # and values being real numbers in the range [0,1]
+    def analyze_tweet_probability_distribution(self, tweet):
         # ok, so simply create the features object
         features = self.make_features(self.preprocess(tweet))
         # classify these features
-        # use prob_classify to determine whether to return the best match, or return "neutral" (if low match)
         prob_object = self.classifier.prob_classify(features)
-        # the best match
-        best_match = prob_object.max()
-        # best match probability
-        best_match_prob = prob_object.prob(best_match)
-        # have a 20 % threshold in place
+        # now create a dictionary that contains the probability for each of the three possible classifications
+        probability_distribution = {}
+        for label in prob_object.samples():
+            if label in legal_classifications:
+                probability_distribution[label] = prob_object.prob(label)
+        # make sure all legal classifications exists. (samples() function only includes greater-than-zero probabilities)
+        for classification in legal_classifications:
+            if classification not in probability_distribution:
+                probability_distribution[classification] = 0
+        # return the probability distribution
+        return probability_distribution
+            
+
+        
+
+    # return the best classification match, based on the analyze_tweet_probability_distribution
+    # also have a threshold: if probability is low, then let classification be neutral
+    # returns a string: "hateful", "neutral" or "kind"
+    # the probability_distribution parameter is expected to be a dictionary containing the probabilities for each label (hateful, neutral, kind) and nothing else
+    def analyze_tweet_verdict(self, tweet, probability_distribution = None):
+        # if no probability distribution is inputed, then create it from the analyze method
+        if probability_distribution == None:
+            probability_distribution = analyze_tweet_probability_distribution(tweet)
+        # find the best match
+        best_match = "none"
+        best_match_prob = 0
+        for label in probability_distribution:
+            if probability_distribution[label] > best_match_prob:
+                best_match_prob = probability_distribution[label]
+                best_match = label
+        # have a 20 % threshold in place for the likelihood of the best match
         if best_match_prob < 0.2:
             print("classification failed – returning neutral value")
-            return 0
-        if best_match == "hateful":
-            print("classified as hateful")
-            return -1
-        elif best_match == "neutral":
-            print("classified as neutral")
-            return 0
-        elif best_match == "kind":
-            print("classified as kind")
-            return 1
-        else:
-            print("serious error in analyze_tweet() in sentiment_analyzer.py. should never, ever happen")
-            return 0
+            return "neutral"
+        # assert that the best_match is one of the accepted return values
+        if best_match not in legal_classifications:
+            print("illegal match '" + best_match + "' in analyze_tweet_verdict() in sentiment_analyzer.py.")
+            error_messenger.send_error_message("illegal match: '" + best_match + "' . serious.", "analyze_tweet_verdict() in sentiment_analyzer.py")
+        # classification can be trusted to some degree
+        print("classified as " + best_match)
+        return best_match
