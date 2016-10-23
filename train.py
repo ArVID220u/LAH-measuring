@@ -19,10 +19,12 @@ from itertools import tee
 def main():
     # use the tweeting app
     streamer = TweetStreamer(setup.TWEETING_CONSUMER_KEY, setup.TWEETING_CONSUMER_SECRET, setup.TWEETING_ACCESS_TOKEN, setup.TWEETING_ACCESS_TOKEN_SECRET)
+    # for error logs
+    streamer.arvid220u_error_title = "main in train.py"
     # add the observer
-    streamer.add_observer(get_tweet)
+    streamer.arvid220u_add_observer(get_tweet)
     # start streaming
-    streamer.statuses.filter(track=setup.SEARCH_PHRASE, language=setup.LANGUAGE)
+    streamer.statuses.filter(track=setup.TRAIN_PHRASE, language=setup.LANGUAGE)
 
 def pairwise(iterable):
     a, b = tee(iterable)
@@ -49,5 +51,5 @@ def get_tweet(tweet):
 
 # if called directly (as in "python3 mainbot.py"), then call main() function
 if __name__ == "__main__":
-    #main()
-    BYB()
+    main()
+    #BYB()
