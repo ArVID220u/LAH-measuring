@@ -5,6 +5,18 @@ import sentiment_database
 # import the error messenger
 import error_messenger
 
+
+# this simple helper class organizes classifications and make them more type safe (although python never will be fully type safe)
+class SentimentClassification():
+    Hateful = "hateful"
+    Neutral = "neutral"
+    Kind = "kind"
+    # a set of all classifications
+    classification_set = {"hateful", "neutral", "kind"}
+    # a list of all classifications
+    classification_list = ["hateful", "neutral", "kind"]
+
+
 # this class has one important method: analyze_tweet, which either returns -1, 0 or 1, each representing different sentiments
 # -1 = hatefulness, 0 = neutrality, 1 = kindness
 # upon being initialized, it automatically trains the Naive Bayes Classifier, from the nltk library
@@ -18,19 +30,19 @@ class SentimentAnalyzer():
 
         # first create three lists: one hateful tweet list and one kind/positive tweet list, and finally one neutral list
         # the tweets in them are completely unprocessed
-        hateful_tweets = sentiment_database.get_tweets("hateful")
-        kind_tweets = sentiment_database.get_tweets("kind")
-        neutral_tweets = sentiment_database.get_tweets("neutral")
+        hateful_tweets = sentiment_database.get_tweets(SentimentClassification.Hateful)
+        kind_tweets = sentiment_database.get_tweets(SentimentClassification.Kind)
+        neutral_tweets = sentiment_database.get_tweets(SentimentClassification.Neutral)
 
         # now we have three lists of tweets
         # transform them into one, so that each element is a tuple consisting of the tweet text, and the sentiment
         all_tweets = []
         for hateful_tweet in hateful_tweets:
-            all_tweets.append((hateful_tweet, "hateful"))
+            all_tweets.append((hateful_tweet, SentimentClassification.Hateful))
         for kind_tweet in kind_tweets:
-            all_tweets.append((kind_tweet, "kind"))
+            all_tweets.append((kind_tweet, SentimentClassification.Kind))
         for neutral_tweet in neutral_tweets:
-            all_tweets.append((neutral_tweet, "neutral"))
+            all_tweets.append((neutral_tweet, SentimentClassification.Neutral))
 
         # now process all the tweet texts
         # the result should be an array, preprocessed_tweets,
@@ -93,11 +105,6 @@ class SentimentAnalyzer():
 
 
 
-    # a set of the legal classifications
-    # that is: hateful, neutral, kind
-    legal_classifications = {"hateful", "neutral", "kind"}
-
-
     # returns a probability distribution for the three classifications (hateful, neutral and kind)
     # the return type is a dictionary, with keys belonging to {-1, 0, 1} (hateful, neutral, kind respectively),
     # and values being real numbers in the range [0,1]
@@ -109,10 +116,10 @@ class SentimentAnalyzer():
         # now create a dictionary that contains the probability for each of the three possible classifications
         probability_distribution = {}
         for label in prob_object.samples():
-            if label in legal_classifications:
+            if label in SentimentClassification.classification_set:
                 probability_distribution[label] = prob_object.prob(label)
         # make sure all legal classifications exists. (samples() function only includes greater-than-zero probabilities)
-        for classification in legal_classifications:
+        for classification in SentimentClassification.classification_list:
             if classification not in probability_distribution:
                 probability_distribution[classification] = 0
         # return the probability distribution
@@ -139,9 +146,9 @@ class SentimentAnalyzer():
         # have a 20 % threshold in place for the likelihood of the best match
         if best_match_prob < 0.2:
             print("classification failed – returning neutral value")
-            return "neutral"
+            return SentimentClassification.Neutral
         # assert that the best_match is one of the accepted return values
-        if best_match not in legal_classifications:
+        if best_match not in SentimentClassification.classification_set:
             print("illegal match '" + best_match + "' in analyze_tweet_verdict() in sentiment_analyzer.py.")
             error_messenger.send_error_message("illegal match: '" + best_match + "' . serious.", "analyze_tweet_verdict() in sentiment_analyzer.py")
         # classification can be trusted to some degree
