@@ -22,18 +22,17 @@ class TwitterApp(Enum):
     measuring = 3
     error_messenger = 5
 
-
-# Store number of requests, so that they won't exceed the rate limit
-mentions_requests_since_last_sleep = 0
-# time of last request is used t be able t reset the requests
-# utc time is reliable
-mentions_time_of_last_request = datetime.utcnow()
-
+# Store the timestamps for the last requests, for each bot
+last_requests_timestamps = {twitter_app: [] for twitter_app in TwitterApp}
 
 
 # the twitter_app parameter is a TwitterApp enum
 # only the mentions app needs to be rate limit checked, since the others manage that themselves
 def authorize(twitter_app):
+    global last_requests_timestamps
+    # add the current time the the last request timestamps
+    last_requests_timestamps[twitter_app].append(datetime.utcnow())
+    # authorization for each bot
     if twitter_app == TwitterApp.tweeting:
         # authorize
         return Twython(setup.TWEETING_CONSUMER_KEY, setup.TWEETING_CONSUMER_SECRET, setup.TWEETING_ACCESS_TOKEN, setup.TWEETING_ACCESS_TOKEN_SECRET)
@@ -41,17 +40,25 @@ def authorize(twitter_app):
         # authorize
         return Twython(setup.MEASURING_CONSUMER_KEY, setup.MEASURING_CONSUMER_SECRET, setup.MEASURING_ACCESS_TOKEN, setup.MEASURING_ACCESS_TOKEN_SECRET)
     elif twitter_app == TwitterApp.mentions:
-        # Increment number of requests made in mentions application
-        global mentions_requests_since_last_sleep
-        mentions_requests_since_last_sleep += 1
-        # update the last request time
-        global mentions_time_of_last_request
-        mentions_time_of_last_request = datetime.utcnow()
         # authorize
         return Twython(setup.MENTIONS_CONSUMER_KEY, setup.MENTIONS_CONSUMER_SECRET, setup.MENTIONS_ACCESS_TOKEN, setup.MENTIONS_ACCESS_TOKEN_SECRET)
     elif twitter_app == TwitterApp.error_messenger:
         # authorize
         return Twython(setup.ERROR_MESSAGE_CONSUMER_KEY, setup.ERROR_MESSAGE_CONSUMER_SECRET, setup.ERROR_MESSAGE_ACCESS_TOKEN, setup.ERROR_MESSAGE_ACCESS_TOKEN_SECRET)
+
+
+# This function returns a bool indicating whether or not the specified app is currently rate limited or not (that is, having sent exactly X requests the last 15 minutes)
+# (Here, X is typically either 180 or 15)
+# Note that while Twitter seems to count rate limits for each API method individually, this method does not do that. The effect being that the bot sleeps too much, if one likes to put it that way.
+def currently_rate_limited(twitter_app, limit):
+    global last_requests_timestamps
+    # get now time
+    now_time = datetime.utcnow()
+    # first filter out each tweet that is older than 15 minutes
+    # use 16 minutes instead of 15 to have a safety margin
+    last_requests_timestamps[twitter_app] = [tweet_time for tweet_time in last_requests_timestamps[twitter_app] if (now_time - tweet_time).total_seconds() < 16*60]
+    # check if length is greater than or equal to limit: then we must wait. (greater than should never happen, but include it in any case)
+    return len(last_requests_timestamps[twitter_app]) >= limit
 
 
 # this method sends a tweet, by first checking with me
@@ -61,17 +68,13 @@ def send_tweet(tweet, twitter_app, in_reply_to_status_id=0):
         print("too long tweet, not sending it")
         return
 
-    # if in mentions streamer, and the number of requests are too large,
-    # then return prematurely without sending the tweet,
-    # since we don't want to clog up the streaming http connection
-    if twitter_app == TwitterApp.mentions:
-        # first check if requests can be reset, that is, if more than 15 minutes have elapsed since last request
-        check_if_requests_can_be_reset()
-        if mentions_requests_are_maximum(14):
-            return
 
-    # we don't need any rate limit check on the main bot, since a 15 minute interval between tweets
-    # is assured to exist by the coordinator (blah, my english is bad)
+    # simply don't send tweet if the app is currently rate limited
+    if currently_rate_limited(twitter_app, 15):
+        # print error message
+        print("rate limited in " + twitter_app + " when trying to send tweet: " + tweet)
+        print("returning prematurely and silently")
+        return
 
     # maybe send it in reply to another tweet
     if in_reply_to_status_id == 0:
@@ -81,22 +84,3 @@ def send_tweet(tweet, twitter_app, in_reply_to_status_id=0):
         # tweet is a reply
         authorize(twitter_app).update_status(status=tweet, in_reply_to_status_id=in_reply_to_status_id)
     print("sent tweet: " + tweet)
-
-
-# This method is called every time a request is to be made on mentions streamer
-# If the requests variable is over limit, then returns true, and starts a sleep (if not already ongoing)
-# else, return false
-def mentions_requests_are_maximum(limit):
-    global mentions_requests_since_last_sleep
-    global mentions_is_sleeping 
-    print("Mentions requests since last sleep: " + str(mentions_requests_since_last_sleep))
-    return mentions_requests_since_last_sleep >= limit
-
-# checking whether the last request in mentions was made more than 15 minutes ago
-# if so, resets the requests, so as to be able to send new tweets
-def check_if_requests_can_be_reset():
-    now_time = datetime.utcnow()
-    global mentions_time_of_last_request
-    if (now_time - mentions_time_of_last_request).total_seconds() > 15*60:
-        global mentions_requests_since_last_sleep
-        mentions_requests_since_last_sleep = 0
