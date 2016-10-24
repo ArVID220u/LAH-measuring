@@ -33,14 +33,14 @@ def add_tweet(tweet):
         ans = input()
     if ans == "a":
         # save the tweet to the abusive file
-        save_tweet(tweet, "hateful")
-        print("hateful")
+        save_tweet(tweet, SentimentClassification.Hateful)
+        print(SentimentClassification.Hateful)
     elif ans == "d":
-        save_tweet(tweet, "kind")
-        print("kind")
+        save_tweet(tweet, SentimentClassification.Kind)
+        print(SentimentClassification.Kind)
     elif ans == "s":
-        save_tweet(tweet, "neutral")
-        print("neutral")
+        save_tweet(tweet, SentimentClassification.Neutral)
+        print(SentimentClassification.Neutral)
 
 
 
