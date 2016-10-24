@@ -56,7 +56,7 @@ def user_abort():
         with open(setup.USER_IDS_PATH, "w") as user_ids_file:
             for (user_id, hatefulness_score) in user_ids:
                 user_ids_file.write(str(user_id) + " " + str(hatefulness_score) + "\n")
-        print("saved user ids to " + setup.USER_IDS_PATH)
+        print("saved user ids to " + setup.USER_IDS_PATH + ". Number of users: " + str(len(user_ids)))
     # listen for user abort
     while True:
         user_response = input()
