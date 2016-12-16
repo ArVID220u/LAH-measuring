@@ -139,7 +139,7 @@ def score_user(user_id):
     # make the sum a mean
     mean_hatefulness_score /= num_simulations
 
-    # 4. Get the minimum elemnt in user_ids, along with its index, and add this user if needed
+    # 4. Get the minimum element in user_ids, along with its index, and add this user if needed
     # first check if length of user ids is less than the maximum number of users
     if len(user_ids) < setup.NUMBER_OF_USERS:
         user_ids.append((user_id, mean_hatefulness_score))
