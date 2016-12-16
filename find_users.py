@@ -39,6 +39,17 @@ def main():
     global sentiment_analyzer
     sentiment_analyzer = SentimentAnalyzer()
     print("initialized sentiment analyzer")
+
+    # also initialize the user ids array to all the elements currently in the user ids data file
+    # first create the file
+    open(setup.USER_IDS_PATH, "a").close()
+    # then open it, and load all of its contents into the user_ids list
+    global user_ids
+    with open(setup.USER_IDS_PATH, "r") as user_ids_file:
+        for line in user_ids_file:
+            user_id, hatefulness_score = [int(x) for x in line.strip().split()]
+            user_ids.append((user_id, hatefulness_score))
+
     # define two threads: one user_abort, and one setup_streamer (which also, incidentally, starts the streamer)
     abort_thread = Thread(target = user_abort)
     streamer_thread = Thread(target = setup_streamer)
@@ -52,7 +63,7 @@ def user_abort():
         global user_ids
         # save the user_ids list into the user_ids.txt file
         # completely overwrite the file, since user_ids should contain all entries already in it
-        # do it atomically (nah, seems to complex for a tiny benefit)
+        # do it atomically (nah, seems too complex for a tiny benefit)
         with open(setup.USER_IDS_PATH, "w") as user_ids_file:
             for (user_id, hatefulness_score) in user_ids:
                 user_ids_file.write(str(user_id) + " " + str(hatefulness_score) + "\n")
@@ -141,6 +152,7 @@ def score_user(user_id):
 
     # 4. Get the minimum element in user_ids, along with its index, and add this user if needed
     # first check if length of user ids is less than the maximum number of users
+    global user_ids
     if len(user_ids) < setup.NUMBER_OF_USERS:
         user_ids.append((user_id, mean_hatefulness_score))
         return
