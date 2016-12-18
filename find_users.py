@@ -15,6 +15,8 @@ import twythonaccess
 from twythonaccess import TwitterApp
 # import random for the simulations
 import random
+# import the streamer
+from streamer import TweetStreamer
 
 
 # How to do this?
