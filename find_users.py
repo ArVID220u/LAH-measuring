@@ -112,7 +112,7 @@ def score_user(user_id):
     # 1. Create list of tweet texts
     # If the tweeting app is currently rate limited, simply return here without doing anything with the user
     # We don't want to build up a queue – there are an abundance of candidates
-    if currently_rate_limited(TwitterApp.tweeting, 900):
+    if twythonaccess.currently_rate_limited(TwitterApp.tweeting, 900):
         return
     user_tweets = twythonaccess.authorize(TwitterApp.tweeting).get_user_timeline(user_id = user_id, count = 200, trim_user = True, include_rts = False)
     tweet_texts = []
