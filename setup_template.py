@@ -16,6 +16,7 @@ NUMBER_OF_USERS = 1000
 # TWEETING
 
 # The tweet with which to always reply to users who mention the bot
+# Make sure it is short – it will be prefixed with a username
 REPLY_TWEET = "❤️❤️❤️"
 
 # The path to a file containing a list of responses
