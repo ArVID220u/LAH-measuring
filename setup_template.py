@@ -21,6 +21,7 @@ REPLY_TWEET = "❤️❤️❤️"
 
 # The path to a file containing a list of responses
 # The file should be an ordinary text file, and the responses should be separated by newlines
+# Ideally, keep the responses under 120 characters, since the user's username will be prepended
 RESPONSES_PATH = "responses.txt"
 
 # The suffix to add to all responses (except for the reply tweet)
