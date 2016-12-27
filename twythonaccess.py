@@ -61,20 +61,22 @@ def currently_rate_limited(twitter_app, limit):
     return len(last_requests_timestamps[twitter_app]) >= limit
 
 
-# this method sends a tweet, by first checking with me
+# this method sends a tweet
+# it returns true if successful, and false if not
 def send_tweet(tweet, twitter_app, in_reply_to_status_id=0):
 
     if len(tweet) > 140:
         print("too long tweet, not sending it")
-        return
+        return False
 
 
     # simply don't send tweet if the app is currently rate limited
+    # return false, indicating that no tweet was sent
     if currently_rate_limited(twitter_app, 15):
         # print error message
         print("rate limited in " + twitter_app + " when trying to send tweet: " + tweet)
         print("returning prematurely and silently")
-        return
+        return False
 
     # maybe send it in reply to another tweet
     if in_reply_to_status_id == 0:
@@ -84,3 +86,4 @@ def send_tweet(tweet, twitter_app, in_reply_to_status_id=0):
         # tweet is a reply
         authorize(twitter_app).update_status(status=tweet, in_reply_to_status_id=in_reply_to_status_id)
     print("sent tweet: " + tweet)
+    return True
