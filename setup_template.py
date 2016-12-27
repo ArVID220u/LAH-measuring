@@ -67,6 +67,11 @@ TWEETING_CONSUMER_KEY = "enter your consumer key here"
 TWEETING_CONSUMER_SECRET = "enter your secret consumer key here"
 TWEETING_ACCESS_TOKEN = "enter your access token here"
 TWEETING_ACCESS_TOKEN_SECRET = "enter your secret access token here"
+# The keys for the backup Tweeting bot. Used if the ordinary Tweeting bot gets suspended. Needs same privileges as above.
+TWEETING_BACKUP_CONSUMER_KEY = "enter your consumer key here"
+TWEETING_BACKUP_CONSUMER_SECRET = "enter your secret consumer key here"
+TWEETING_BACKUP_ACCESS_TOKEN = "enter your access token here"
+TWEETING_BACKUP_ACCESS_TOKEN_SECRET = "enter your secret access token here"
 
 # Keys for the Mentions bot. Needs read and write privileges.
 MENTIONS_CONSUMER_KEY = "enter your consumer key here"
@@ -74,11 +79,16 @@ MENTIONS_CONSUMER_SECRET = "enter your secret consumer key here"
 MENTIONS_ACCESS_TOKEN = "enter your access token here"
 MENTIONS_ACCESS_TOKEN_SECRET = "enter your secret access token here"
 
-# Keys for the Tweeting bot. Needs read privileges.
+# Keys for the Measuring bot. Needs read privileges.
 MEASURING_CONSUMER_KEY = "enter your consumer key here"
 MEASURING_CONSUMER_SECRET = "enter your secret consumer key here"
 MEASURING_ACCESS_TOKEN = "enter your access token here"
 MEASURING_ACCESS_TOKEN_SECRET = "enter your secret access token here"
+# The keys for the backup Measuring bot. Used if the ordinary Measuring bot gets suspended. Needs same privileges as above.
+MEASURING_BACKUP_CONSUMER_KEY = "enter your consumer key here"
+MEASURING_BACKUP_CONSUMER_SECRET = "enter your secret consumer key here"
+MEASURING_BACKUP_ACCESS_TOKEN = "enter your access token here"
+MEASURING_BACKUP_ACCESS_TOKEN_SECRET = "enter your secret access token here"
 
 # A string indicating the screen name of a twitter user who should receive error messages via DM (again, screen name without '@')
 # Set this to None to not send error messages to anyone, and then don't bother filling in the api keys

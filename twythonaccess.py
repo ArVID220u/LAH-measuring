@@ -26,6 +26,13 @@ class TwitterApp(Enum):
 last_requests_timestamps = {twitter_app: [] for twitter_app in TwitterApp}
 
 
+# Since the operations of the bot are crucial, and we constantly run a risk of getting restricted by the Twitter API, have two backup apps
+# The two crucial operations are tweeting and measuring, so we only have backups for them
+tweeting_in_backup_mode = False
+measuring_in_backup_mode = False
+
+
+
 # the twitter_app parameter is a TwitterApp enum
 # only the mentions app needs to be rate limit checked, since the others manage that themselves
 def authorize(twitter_app):
@@ -35,10 +42,18 @@ def authorize(twitter_app):
     # authorization for each bot
     if twitter_app == TwitterApp.tweeting:
         # authorize
-        return Twython(setup.TWEETING_CONSUMER_KEY, setup.TWEETING_CONSUMER_SECRET, setup.TWEETING_ACCESS_TOKEN, setup.TWEETING_ACCESS_TOKEN_SECRET)
+        # choose different keys based on whether backup mode is on or not
+        if not tweeting_in_backup_mode:
+            return Twython(setup.TWEETING_CONSUMER_KEY, setup.TWEETING_CONSUMER_SECRET, setup.TWEETING_ACCESS_TOKEN, setup.TWEETING_ACCESS_TOKEN_SECRET)
+        else:
+            return Twython(setup.TWEETING_BACKUP_CONSUMER_KEY, setup.TWEETING_BACKUP_CONSUMER_SECRET, setup.TWEETING_BACKUP_ACCESS_TOKEN, setup.TWEETING_BACKUP_ACCESS_TOKEN_SECRET)
     elif twitter_app == TwitterApp.measuring:
         # authorize
-        return Twython(setup.MEASURING_CONSUMER_KEY, setup.MEASURING_CONSUMER_SECRET, setup.MEASURING_ACCESS_TOKEN, setup.MEASURING_ACCESS_TOKEN_SECRET)
+        # choose differnet keys based on whether backup mode is on or not
+        if not tweeting_in_backup_mode:
+            return Twython(setup.MEASURING_CONSUMER_KEY, setup.MEASURING_CONSUMER_SECRET, setup.MEASURING_ACCESS_TOKEN, setup.MEASURING_ACCESS_TOKEN_SECRET)
+        else:
+            return Twython(setup.MEASURING_BACKUP_CONSUMER_KEY, setup.MEASURING_BACKUP_CONSUMER_SECRET, setup.MEASURING_BACKUP_ACCESS_TOKEN, setup.MEASURING_BACKUP_ACCESS_TOKEN_SECRET)
     elif twitter_app == TwitterApp.mentions:
         # authorize
         return Twython(setup.MENTIONS_CONSUMER_KEY, setup.MENTIONS_CONSUMER_SECRET, setup.MENTIONS_ACCESS_TOKEN, setup.MENTIONS_ACCESS_TOKEN_SECRET)
