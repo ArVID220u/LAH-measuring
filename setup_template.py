@@ -22,7 +22,7 @@ REPLY_TWEET = "❤️❤️❤️"
 # The file should be an ordinary text file, and the responses should be separated by newlines
 RESPONSES_PATH = "responses.txt"
 
-# The suffix to add to all responses (except the reply tweet)
+# The suffix to add to all responses (except for the reply tweet)
 RESPONSE_SUFFIX = " ❤️"
 
 
