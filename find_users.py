@@ -17,6 +17,8 @@ from twythonaccess import TwitterApp
 import random
 # import the streamer
 from streamer import TweetStreamer
+# error reporting
+import error_messenger
 
 
 # How to do this?
@@ -59,17 +61,17 @@ def main():
     abort_thread.start()
     streamer_thread.start()
 
+def save_user_ids():
+    global user_ids
+    # save the user_ids list into the user_ids.txt file
+    # completely overwrite the file, since user_ids should contain all entries already in it
+    # do it atomically (nah, seems too complex for a tiny benefit)
+    with open(setup.USER_IDS_PATH, "w") as user_ids_file:
+        for (user_id, hatefulness_score) in user_ids:
+            user_ids_file.write(str(user_id) + " " + str(hatefulness_score) + "\n")
+    print("saved user ids to " + setup.USER_IDS_PATH + ". Number of users: " + str(len(user_ids)))
 
 def user_abort():
-    def save_user_ids():
-        global user_ids
-        # save the user_ids list into the user_ids.txt file
-        # completely overwrite the file, since user_ids should contain all entries already in it
-        # do it atomically (nah, seems too complex for a tiny benefit)
-        with open(setup.USER_IDS_PATH, "w") as user_ids_file:
-            for (user_id, hatefulness_score) in user_ids:
-                user_ids_file.write(str(user_id) + " " + str(hatefulness_score) + "\n")
-        print("saved user ids to " + setup.USER_IDS_PATH + ". Number of users: " + str(len(user_ids)))
     # listen for user abort
     while True:
         user_response = input()
@@ -100,8 +102,19 @@ def setup_streamer():
     # add the observer (the new_tweet method)
     streamer.arvid220u_add_observer(new_tweet)
     # start streaming
-    # the track keyword is interesting. perhaps, if the search phrase is the same as the train search phrase, results will be skewed, in a bad way
-    streamer.statuses.filter(track=setup.SEARCH_PHRASE, language=setup.LANGUAGE)
+    # error handling
+    try:
+        # the track keyword is interesting. perhaps, if the search phrase is the same as the train search phrase, results will be skewed, in a bad way
+        streamer.statuses.filter(track=setup.SEARCH_PHRASE, language=setup.LANGUAGE)
+    except Exception as exception:
+        print(exception)
+        error_messenger.send_error_message(exception, "find_users.py > setup_streamer()")
+        print("not restarting, rather just saving the currently gathered user ids")
+        print("before reinstating the process, please check so that the user_ids file is not corrupt")
+        save_user_ids()
+        error_messenger.send_error_message("Before restarting find_users, make sure the user_ids file is not corrupted", "find_users.py > setup_streamer()")
+        import sys
+        sys.exit()
 
 
 
