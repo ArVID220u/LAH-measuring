@@ -215,7 +215,7 @@ def tweet_loop():
             while response in sent_responses_to_user[user_id]:
                 response = responses[random.randint(0,len(responses)-1)]
             # send this response to the user, mentioning them
-            response_tweet = "@" + screen_name_for_user_id[user_id] + " " + response
+            response_tweet = "@" + screen_name_for_user_id[user_id] + " " + response + " " + setup.RESPONSE_SUFFIX
             # send this tweet
             # don't care whether it is sent or not – as long as there are not too many users, it should be sent without any problem
             # risk is twitter banning the bot due to its messages being considered unsolicited and rude
