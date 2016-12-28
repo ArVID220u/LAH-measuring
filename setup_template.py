@@ -33,6 +33,7 @@ RESPONSE_SUFFIX = " ❤️"
 
 # The path to the file containing the json objects of the collected tweets
 # The raw data, essentially
+# The format, thus, is: a json array of the tweet json objects, and nothing more
 RAW_DATA_PATH = "raw_data.json"
 # The path to the csv file containing the score, etc.
 PROCESSED_DATA_PATH = "processed_data.csv"
