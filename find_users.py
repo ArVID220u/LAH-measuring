@@ -19,6 +19,8 @@ import random
 from streamer import TweetStreamer
 # error reporting
 import error_messenger
+# measure time
+from datetime import datetime
 
 
 # How to do this?
@@ -129,6 +131,8 @@ def score_user(user_id):
         return
     user_tweets = twythonaccess.authorize(TwitterApp.tweeting).get_user_timeline(user_id = user_id, count = 200, trim_user = True, include_rts = False)
     tweet_texts = []
+    # the timestamp of the tweet sent farthest away in time
+    oldest_tweet_timestamp = datetime.utcnow()
     for tweet in user_tweets:
         if "text" not in tweet:
             continue
@@ -138,9 +142,23 @@ def score_user(user_id):
         if "retweeted_status" in tweet:
             continue
         tweet_texts.append(tweet["text"])
+        # record this tweet's time
+        this_time = datetime.strptime(tweet["created_at"], "%a %b %d %H:%M:%S +0000 %Y")
+        # check if the time offset between this time and the oldest_tweet_timestamp is negative: if it is, then update the oldest tweet timestamp
+        if (this_time - oldest_tweet_timestamp).total_seconds() < 0:
+            oldest_tweet_timestamp = this_time
     # (1.1. Ensure the length of the tweet texts list is longer than 10 tweets – otherwise, treat it as statistically unreliable data, and return immediately)
     if len(tweet_texts) < 10:
         return
+
+    # 1.2 Make sure the last tweet in the list was sent in the interval [n*(6 hours), n*(48 hours)]
+    if (datetime.utcnow() - oldest_tweet_timestamp).total_seconds() > len(tweet_texts)*(48*60*60):
+        # too infrequent twitterer
+        return
+    if (datetime.utcnow() - oldest_tweet_timestamp).total_seconds() < len(tweet_texts)*(6*60*60):
+        # too frequent twitterer
+        return
+
 
     # 2. Create a list of probability distributions based on each tweet
     probability_distributions = []
