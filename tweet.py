@@ -51,6 +51,14 @@ sent_responses_to_user = {}
 responses = []
 
 
+# When this flag is set to true, all processes and threads should ideally stop executing
+self_destruction_flag = False
+
+
+# we need the mentions streamer as a global, so as to be able to disconnect it gracefully at self destruction
+mentions_streamer = None
+
+
 
 # The main function, which should start both the mentions streamer and the tweet loop
 def main():
@@ -65,6 +73,19 @@ def main():
     # start the threads
     mentions_thread.start()
     tweet_loop.start()
+
+
+
+# We need a way to self destruct ourselves, so as to be able to stop sending tweets
+def self_destruct():
+    # First, set the self destruction flag to true
+    global self_destruction_flag
+    self_destruction_flag = True
+    # Then, disconnect the mentions streamer
+    global mentions_streamer
+    mentions_streamer.disconnect()
+
+
 
 
 def setup():
@@ -112,6 +133,7 @@ def mentions_streamer():
     print("mentions streamer")
     # initialize the mentions streamer
     # use the mentions app
+    global mentions_streamer
     mentions_streamer = TweetStreamer(setup.MENTIONS_CONSUMER_KEY, setup.MENTIONS_CONSUMER_SECRET, setup.MENTIONS_ACCESS_TOKEN, setup.MENTIONS_ACCESS_TOKEN_SECRET)
     # for error logs
     mentions_streamer.arvid220u_error_title = "tweet.py > mentions_streamer()"
@@ -119,12 +141,15 @@ def mentions_streamer():
     mentions_streamer.arvid220u_add_observer(new_mention)
     # start streaming
     # wrap it in error handling
-    while True:
+    while not self_destruction_flag:
         try:
             # RTs will automatically be discarded (default setting)
             # check for tweets referencing self
             streamer.statuses.filter(track=("@" + setup.TWITTER_USERNAME))
         except Exception as exception:
+            # If self destruction flag is true, then continue (same as break)
+            if self_destruction_flag:
+                break
             # print the exception and then sleep for an hour,
             # and hope that the problem will resolve itself, magically
             # (as it almost always does, since the problem is probably in Twitter's servers, or something)
@@ -146,6 +171,9 @@ replied_to_users = {}
 # Whenever a new tweet referencing self is discovered, this method is called
 # The argument is the ordinary tweet dictionary, as provided by twitter, without any changes
 def new_mention(tweet):
+    # if the self desturction flag is on, then return immediately
+    if self_destruction_flag:
+        return
     # hmm... Should it be possible for a user to be replied to many times, or should there be a limit on the number of responses per user?
     # This is interesting, though I'm not sure whether I know the perfect strategy.
     # Perhaps, the best way to go is to only reply once in a specified time range (say 1 day), instead of having it applied for all time
@@ -194,7 +222,7 @@ def tweet_loop():
     print("tweet loop")
     # have an infinte loop
     # every loop iteration should take one week, and in each iteration, exactly one tweet should be sent to each user
-    while True:
+    while not self_destruction_flag:
         start_time = datetime.utcnow()
         # first, scramble the user ids list so as to make the sending of the users completely random
         user_ids_sendlist = user_ids[:]
@@ -206,6 +234,10 @@ def tweet_loop():
         tweet_interval = ((7*24*60*60-60*60) / len(user_ids))
         # now iterate over each user id in the sendlist
         for user_id in user_ids_sendlist:
+            # if we are in self destruction, then return here (and yes, I know, it may be that not all users receive the same amount of tweets, this way)
+            # (continuing thought: but it is of utter importance to have the treatment stop at the given signal)
+            if self_destruction_flag:
+                break
             # randomly choose a tweet from the response list
             # do it repeatedly until a response that has not yet been sent to this user is found
             # first, check whether the response set for this user has a length that is equal to the response list – if so, reset it
@@ -229,6 +261,8 @@ def tweet_loop():
                 print("will sleep for twenty minutes to try to avoid the exception")
                 time.sleep(16*60)
                 print("has slept for twenty minutes and will retry sending the tweet")
+                if self_destruction_flag:
+                    break
                 try:
                     twythonaccess.send_tweet(response_tweet, TwitterApp.tweeting)
                 except Exception as exception2:
