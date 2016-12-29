@@ -4,17 +4,9 @@ import nltk
 import sentiment_database
 # import the error messenger
 import error_messenger
+# import sentiment classification
+from sentiment_classification import SentimentClassification
 
-
-# this simple helper class organizes classifications and make them more type safe (although python never will be fully type safe)
-class SentimentClassification():
-    Hateful = "hateful"
-    Neutral = "neutral"
-    Kind = "kind"
-    # a set of all classifications
-    classification_set = {"hateful", "neutral", "kind"}
-    # a list of all classifications
-    classification_list = ["hateful", "neutral", "kind"]
 
 
 # this class has one important method: analyze_tweet, which either returns -1, 0 or 1, each representing different sentiments

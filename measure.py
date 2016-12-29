@@ -23,7 +23,7 @@ import error_messenger
 import time
 # import the sentiment analysis
 from sentiment_analyzer import SentimentAnalyzer
-from sentiment_analyzer import SentimentClassification
+from sentiment_classification import SentimentClassification
 
 
 # OK. We will store every incoming tweet (excluding those that are RTs and such) in the raw data json

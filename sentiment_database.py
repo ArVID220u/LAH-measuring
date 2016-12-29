@@ -1,6 +1,9 @@
 # this is a file meant to coordinate the database of abusive and nonabusive tweets
 # it also acts as a tool to easily classify streamed tweets, via the add_tweet method
 
+# import sentiment classification
+from sentiment_classification import SentimentClassification
+
 
 # get tweets
 # this function returns only the tweets (not the ids)
