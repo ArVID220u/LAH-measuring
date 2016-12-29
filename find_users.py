@@ -53,7 +53,9 @@ def main():
     global user_ids
     with open(setup.USER_IDS_PATH, "r") as user_ids_file:
         for line in user_ids_file:
-            user_id, hatefulness_score = [int(x) for x in line.strip().split()]
+            sml = [x for x in line.strip().split()]
+            user_id = int(sml[0])
+            hatefulness_score = float(sml[1])
             user_ids.append((user_id, hatefulness_score))
 
     # define two threads: one user_abort, and one setup_streamer (which also, incidentally, starts the streamer)
@@ -80,7 +82,7 @@ def user_abort():
         if (user_response == "q"):
             # now quit
             global streamer
-            steamer.disconnect()
+            streamer.disconnect()
             # save user ids
             save_user_ids()
             # sys exit
@@ -123,6 +125,7 @@ def setup_streamer():
 # Return a float in the interval [0, 1], which represents the ratio of hateful tweets
 # Disregard both kind and neutral tweets, since they are here deemed to have no impact
 def score_user(user_id):
+    global sentiment_analyzer
     print("score user")
     # 1. Create list of tweet texts
     # If the tweeting app is currently rate limited, simply return here without doing anything with the user
@@ -149,14 +152,17 @@ def score_user(user_id):
             oldest_tweet_timestamp = this_time
     # (1.1. Ensure the length of the tweet texts list is longer than 10 tweets – otherwise, treat it as statistically unreliable data, and return immediately)
     if len(tweet_texts) < 10:
+        print("too few tweets")
         return
 
     # 1.2 Make sure the last tweet in the list was sent in the interval [n*(6 hours), n*(48 hours)]
     if (datetime.utcnow() - oldest_tweet_timestamp).total_seconds() > len(tweet_texts)*(48*60*60):
         # too infrequent twitterer
+        print("too infrequent twitterer")
         return
     if (datetime.utcnow() - oldest_tweet_timestamp).total_seconds() < len(tweet_texts)*(6*60*60):
         # too frequent twitterer
+        print("too frequent twitterer")
         return
 
 
@@ -176,14 +182,19 @@ def score_user(user_id):
             hateful_prob = 0
             for label in prob_distribution:
                 prob_sum += prob_distribution[label]
+                print("prob dist for label " + label + ": " + str(prob_distribution[label]))
                 if label == SentimentClassification.Hateful:
                     hateful_prob = prob_distribution[label]
             # check if the classification is hateful, based on randomly generated numbers within the probability range
             # recall that random.random() returns a random number between 0 and 1
+            print("prob sum: " + str(prob_sum))
+            print("hateful prob: " + str(hateful_prob))
             if prob_sum * random.random() <= hateful_prob:
-                ++number_of_hateful_tweets
+                print("a hateful tweet")
+                number_of_hateful_tweets += 1
         # add this to the hatefulness score
         mean_hatefulness_score += number_of_hateful_tweets / len(probability_distributions)
+    print("hatefulness sum (to be divided by 500): " + str(mean_hatefulness_score))
     # make the sum a mean
     mean_hatefulness_score /= num_simulations
 
@@ -192,6 +203,7 @@ def score_user(user_id):
     global user_ids
     if len(user_ids) < setup.NUMBER_OF_USERS:
         user_ids.append((user_id, mean_hatefulness_score))
+        print("added user to user_ids list")
         return
     # get the min index
     min_index = 0
@@ -204,13 +216,16 @@ def score_user(user_id):
     if mean_hatefulness_score > min_hatefulness_score:
         # update the user_ids list
         user_ids[min_index] = (user_id, mean_hatefulness_score)
+        print("added user to user_ids list")
     # DONE
 
 
 
 def new_tweet(tweet):
+    global sentiment_analyzer
     # only proceed to score the user if this tweet is classified as hateful
     print("new tweet")
+    print(tweet["text"])
     if sentiment_analyzer.analyze_tweet_verdict(tweet["text"]) == SentimentClassification.Hateful:
         score_user(tweet["user"]["id"])
 
