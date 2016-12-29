@@ -223,7 +223,7 @@ def setup():
 
     # first check to see whether or not the data files are empty or not
     # if they are nonempty, then notify, and quit
-    if is_non_zero_file(setup.RAW_DATA_PATH) || is_non_zero_file(setup.PROCESSED_DATA_PATH):
+    if is_non_zero_file(setup.RAW_DATA_PATH) or is_non_zero_file(setup.PROCESSED_DATA_PATH):
         print("Data already exists, either at " + setup.RAW_DATA_PATH + " or at " + setup.PROCESSED_DATA_PATH + ".")
         print("Delete these files (after having copied its contents, perhaps), and try again.")
         print("Measure.py will now self destruct.")
