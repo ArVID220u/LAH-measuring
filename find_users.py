@@ -75,9 +75,14 @@ def save_user_ids():
             user_ids_file.write(str(user_id) + " " + str(hatefulness_score) + "\n")
     print("saved user ids to " + setup.USER_IDS_PATH + ". Number of users: " + str(len(user_ids)))
 
+
+quit_flag = False
+
+
 def user_abort():
     # listen for user abort
-    while True:
+    global quit_flag
+    while not quit_flag:
         user_response = input()
         if (user_response == "q"):
             # now quit
@@ -86,8 +91,8 @@ def user_abort():
             # save user ids
             save_user_ids()
             # sys exit
-            import sys
-            sys.exit()
+            quit_flag = True
+            break
         elif (user_response == "w"):
             save_user_ids()
         else:
@@ -99,6 +104,7 @@ def user_abort():
 def setup_streamer():
     # make the streamer global, so as to be able to access it in the user abort function
     global streamer
+    global quit_flag
     # use the tweeting app
     streamer = TweetStreamer(setup.TWEETING_CONSUMER_KEY, setup.TWEETING_CONSUMER_SECRET, setup.TWEETING_ACCESS_TOKEN, setup.TWEETING_ACCESS_TOKEN_SECRET)
     # for error logs
@@ -107,24 +113,26 @@ def setup_streamer():
     streamer.arvid220u_add_observer(new_tweet)
     # start streaming
     # error handling
-    while True:
+    while not quit_flag:
         try:
             # the track keyword is interesting. perhaps, if the search phrase is the same as the train search phrase, results will be skewed, in a bad way
             streamer.statuses.filter(track=setup.SEARCH_PHRASE, language=setup.LANGUAGE)
         except Exception as exception:
             print(exception)
+            if quit_flag:
+                break
+            save_user_ids()
             # if incomplete read, just continue
-            if exception == "('Connection broken: IncompleteRead(0 bytes read, 1 more expected)', IncompleteRead(0 bytes read, 1 more expected))":
+            if str(exception) == "('Connection broken: IncompleteRead(0 bytes read, 1 more expected)', IncompleteRead(0 bytes read, 1 more expected))":
                 print("restarting")
                 continue
             error_messenger.send_error_message(exception, "find_users.py > setup_streamer()")
             print("not restarting, rather just saving the currently gathered user ids")
             print("before reinstating the process, please check so that the user_ids file is not corrupt")
-            save_user_ids()
             error_messenger.send_error_message("Before restarting find_users, make sure the user_ids file is not corrupted", "find_users.py > setup_streamer()")
-            import sys
-            sys.exit()
             break
+    import sys
+    sys.exit()
 
 
 
