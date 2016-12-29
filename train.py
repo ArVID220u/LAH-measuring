@@ -27,8 +27,12 @@ def main():
     while True:
         try:
             streamer.statuses.filter(track=setup.TRAIN_PHRASE, language=setup.LANGUAGE)
-        except:
-            continue
+        except Exception as exception:
+            print(exception)
+            if exception == "('Connection broken: IncompleteRead(0 bytes read, 1 more expected)', IncompleteRead(0 bytes read, 1 more expected))":
+                continue
+            else:
+                break
 
 def pairwise(iterable):
     a, b = tee(iterable)
