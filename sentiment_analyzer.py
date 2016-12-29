@@ -83,7 +83,11 @@ class SentimentAnalyzer():
         no_mentions_text = text
         while no_mentions_text.startswith("@"):
             # remove the first word, which in this case in an @username
-            no_mentions_text = no_mentions_text.split(" ", 1)[1]
+            no_mentions_split = no_mentions_text.split(" ", 1)
+            if len(no_mentions_split) < 2:
+                # raise error!
+                raise ValueError("No words in tweet")
+            no_mentions_text = no_mentions_split[1]
         return no_mentions_text
 
 
@@ -101,8 +105,16 @@ class SentimentAnalyzer():
     # the return type is a dictionary, with keys belonging to {-1, 0, 1} (hateful, neutral, kind respectively),
     # and values being real numbers in the range [0,1]
     def analyze_tweet_probability_distribution(self, tweet):
-        # ok, so simply create the features object
-        features = self.make_features(self.preprocess(tweet))
+        try:
+            # ok, so simply create the features object
+            features = self.make_features(self.preprocess(tweet))
+        except ValueError as exception:
+            print(exception)
+            probability_distribution = {}
+            for classification in SentimentClassification.classification_list:
+                probability_distribution[classification] = 0
+            probability_distribution[SentimentClassification.Neutral] = 1
+            return probability_distribution
         # classify these features
         prob_object = self.classifier.prob_classify(features)
         # now create a dictionary that contains the probability for each of the three possible classifications
