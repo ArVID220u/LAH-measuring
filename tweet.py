@@ -97,7 +97,8 @@ def setup():
     global user_ids
     with open(setup.USER_IDS_PATH, "r") as user_ids_file:
         for line in user_ids_file:
-            user_id, hatefulness_score = [int(x) for x in line.strip().split()]
+            sml = [x for x in line.strip().split()]
+            user_id = int(sml[0])
             user_ids.append(user_id)
 
     # find the screen name for every user id
