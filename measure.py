@@ -117,7 +117,7 @@ def tweet_streamer():
             streamer_object.statuses.filter(follow = user_ids)
         except Exception as exception:
             if self_destruction_flag:
-                continue
+                break
             # oh no! an error occurred
             # this is not good. not good at all. we don't want the measuring process to have a hole in it
             # we want complete data.
