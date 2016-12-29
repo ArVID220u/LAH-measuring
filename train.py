@@ -24,7 +24,11 @@ def main():
     # add the observer
     streamer.arvid220u_add_observer(get_tweet)
     # start streaming
-    streamer.statuses.filter(track=setup.TRAIN_PHRASE, language=setup.LANGUAGE)
+    while True:
+        try:
+            streamer.statuses.filter(track=setup.TRAIN_PHRASE, language=setup.LANGUAGE)
+        except:
+            continue
 
 def pairwise(iterable):
     a, b = tee(iterable)

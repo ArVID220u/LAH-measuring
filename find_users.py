@@ -107,18 +107,24 @@ def setup_streamer():
     streamer.arvid220u_add_observer(new_tweet)
     # start streaming
     # error handling
-    try:
-        # the track keyword is interesting. perhaps, if the search phrase is the same as the train search phrase, results will be skewed, in a bad way
-        streamer.statuses.filter(track=setup.SEARCH_PHRASE, language=setup.LANGUAGE)
-    except Exception as exception:
-        print(exception)
-        error_messenger.send_error_message(exception, "find_users.py > setup_streamer()")
-        print("not restarting, rather just saving the currently gathered user ids")
-        print("before reinstating the process, please check so that the user_ids file is not corrupt")
-        save_user_ids()
-        error_messenger.send_error_message("Before restarting find_users, make sure the user_ids file is not corrupted", "find_users.py > setup_streamer()")
-        import sys
-        sys.exit()
+    while True:
+        try:
+            # the track keyword is interesting. perhaps, if the search phrase is the same as the train search phrase, results will be skewed, in a bad way
+            streamer.statuses.filter(track=setup.SEARCH_PHRASE, language=setup.LANGUAGE)
+        except Exception as exception:
+            print(exception)
+            # if incomplete read, just continue
+            if exception == "('Connection broken: IncompleteRead(0 bytes read, 1 more expected)', IncompleteRead(0 bytes read, 1 more expected))":
+                print("restarting")
+                continue
+            error_messenger.send_error_message(exception, "find_users.py > setup_streamer()")
+            print("not restarting, rather just saving the currently gathered user ids")
+            print("before reinstating the process, please check so that the user_ids file is not corrupt")
+            save_user_ids()
+            error_messenger.send_error_message("Before restarting find_users, make sure the user_ids file is not corrupted", "find_users.py > setup_streamer()")
+            import sys
+            sys.exit()
+            break
 
 
 
@@ -226,6 +232,9 @@ def new_tweet(tweet):
     # only proceed to score the user if this tweet is classified as hateful
     print("new tweet")
     print(tweet["text"])
+    # make sure the tweeter is english-speaking, or the classification won't work
+    if tweet["user"]["lang"] != "en":
+        return
     if sentiment_analyzer.analyze_tweet_verdict(tweet["text"]) == SentimentClassification.Hateful:
         score_user(tweet["user"]["id"])
 
