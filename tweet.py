@@ -116,7 +116,7 @@ def mentions_streamer():
     # for error logs
     mentions_streamer.arvid220u_error_title = "tweet.py > mentions_streamer()"
     # add the observer (the new_mention method)
-    streamer.arvid220u_add_observer(new_mention)
+    mentions_streamer.arvid220u_add_observer(new_mention)
     # start streaming
     # wrap it in error handling
     while True:
