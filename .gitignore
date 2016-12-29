@@ -3,5 +3,10 @@ setup.py
 __pycache__
 *.bak
 
+# data files
+user_ids.txt
+raw_data.json
+processed_data.csv
+
 # For vim
 *.s[a-w][a-z]
