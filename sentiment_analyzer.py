@@ -127,7 +127,7 @@ class SentimentAnalyzer():
     def analyze_tweet_verdict(self, tweet, probability_distribution = None):
         # if no probability distribution is inputed, then create it from the analyze method
         if probability_distribution == None:
-            probability_distribution = analyze_tweet_probability_distribution(tweet)
+            probability_distribution = self.analyze_tweet_probability_distribution(tweet)
         # find the best match
         best_match = "none"
         best_match_prob = 0
