@@ -7,6 +7,12 @@ TWITTER_USERNAME = "screen name"
 
 
 
+# We need to know whether this bot will be used for the control group, or the treatment group
+# The treatment group will be sent tweets, while the control group will only be measured
+IS_CONTROL_GROUP = False
+
+
+
 # FINDING USERS
 
 # The number of users to find. For a single tweeting bot, something like 1000 users is appropriate.
