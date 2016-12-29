@@ -19,7 +19,7 @@ from datetime import timedelta
 # errors, and status updates
 import error_messenger
 # sleep is critical
-import time
+from time import sleep
 
 
 
@@ -47,13 +47,13 @@ def main():
     end_time = tweet_end_time + timedelta(days = 30)
 
     print("INFORMATION")
-    print("Will start at " + str(start_time) + ".")
-    print("Will end at " + str(end_time) + ".")
-    error_messenger.send_error_message("Will start at " + str(start_time) + ".", "manager.py")
-    error_messenger.send_error_message("Will end at " + str(end_time) + ".", "manager.py")
+    print("Will start at " + str(start_time) + " (UTC).")
+    print("Will end at " + str(end_time) + " (UTC).")
+    error_messenger.send_error_message("Will start at " + str(start_time) + " (UTC).", "manager.py")
+    error_messenger.send_error_message("Will end at " + str(end_time) + " (UTC).", "manager.py")
 
     # sleep until the start time
-    time.sleep((start_time - datetime.utcnow()).total_seconds())
+    sleep((start_time - datetime.utcnow()).total_seconds())
 
     # start the measure thread
     measure_thread.start()
@@ -61,18 +61,18 @@ def main():
     # if we are not in control group, start and manage the tweet thread
     if not setup.IS_CONTROL_GROUP:
         # sleep until tweet start time
-        time.sleep((tweet_start_time - datetime.utcnow()).total_seconds())
+        sleep((tweet_start_time - datetime.utcnow()).total_seconds())
 
         tweet_thread.start()
 
         # sleep until tweet end time
-        time.sleep((tweet_end_time - datetime.utcnow()).total_seconds())
+        sleep((tweet_end_time - datetime.utcnow()).total_seconds())
 
         # send self destruct message to tweet thread
         tweet.self_destruct()
 
     # sleep until global end time
-    time.sleep((end_time - datetime.utcnow()).total_seconds())
+    sleep((end_time - datetime.utcnow()).total_seconds())
 
     # send self destruct message to measure process
     measure.self_destruct()
