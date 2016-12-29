@@ -151,6 +151,9 @@ def mentions_streamer():
             # If self destruction flag is true, then continue (same as break)
             if self_destruction_flag:
                 break
+            # check if exception is incomplete read: then, just restart immediately
+            if exception == "('Connection broken: IncompleteRead(0 bytes read, 1 more expected)', IncompleteRead(0 bytes read, 1 more expected))":
+                continue
             # print the exception and then sleep for an hour,
             # and hope that the problem will resolve itself, magically
             # (as it almost always does, since the problem is probably in Twitter's servers, or something)
