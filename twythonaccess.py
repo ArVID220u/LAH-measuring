@@ -89,7 +89,7 @@ def send_tweet(tweet, twitter_app, in_reply_to_status_id=0):
     # return false, indicating that no tweet was sent
     if currently_rate_limited(twitter_app, 15):
         # print error message
-        print("rate limited in " + twitter_app + " when trying to send tweet: " + tweet)
+        print("rate limited in " + str(twitter_app) + " when trying to send tweet: " + tweet)
         print("returning prematurely and silently")
         return False
 

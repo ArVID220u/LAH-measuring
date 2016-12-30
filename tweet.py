@@ -64,7 +64,7 @@ mentions_streamer = None
 def main():
     print("main")
     # setup is important
-    setup()
+    set_up()
     print("setup done")
     # one thread should be the mentions streamer
     mentions_thread = Thread(target = mentions_streamer)
@@ -72,7 +72,7 @@ def main():
     tweet_loop_thread = Thread(target = tweet_loop)
     # start the threads
     mentions_thread.start()
-    tweet_loop.start()
+    tweet_loop_thread.start()
 
 
 
@@ -88,7 +88,7 @@ def self_destruct():
 
 
 
-def setup():
+def set_up():
     # do some setup first, like loading the user ids into a list, 
     # and also create the dictionary of user ids to sent responses
     # finally, load the list of responses from the responses text file, for easy access
@@ -104,13 +104,14 @@ def setup():
     # find the screen name for every user id
     global screen_name_for_user_id
     for user_id in user_ids:
-        # use the tweeting app for checking up the user
+        # use the mentions app for checking up the user
+        # this is since it is less critical than the tweeting app, while having the same privileges
         # if rate limited, wait for 1 minute, and then try again
         # the show user request can be sent 900 times per 15 minute window
-        while twythonaccess.currently_rate_limited(TwitterApp.tweeting, 900):
+        while twythonaccess.currently_rate_limited(TwitterApp.mentions, 900):
             time.sleep(60)
         # get the screen name of the user
-        screen_name = twythonaccess.authorize(TwitterApp.tweeting).show_user(user_id = user_id)["screen_name"]
+        screen_name = twythonaccess.authorize(TwitterApp.mentions).show_user(user_id = user_id)["screen_name"]
         screen_name_for_user_id[user_id] = screen_name
 
     # create the dictionary of empty sets per each user id
@@ -146,7 +147,7 @@ def mentions_streamer():
         try:
             # RTs will automatically be discarded (default setting)
             # check for tweets referencing self
-            streamer.statuses.filter(track=("@" + setup.TWITTER_USERNAME))
+            mentions_streamer.statuses.filter(track=("@" + setup.TWITTER_USERNAME))
         except Exception as exception:
             # If self destruction flag is true, then continue (same as break)
             if self_destruction_flag:
@@ -288,7 +289,7 @@ def tweet_loop():
                         error_messenger.send_error_message(exception, "tweet.py > tweet_loop()")
                         error_messenger.send_error_message("We're all doomed. Exception couldn't be resolved, even after tremendous effort. Now, ignoring the error.", "tweet.py > tweet_loop()")
             # add the chosen response to the sent responses set
-            sent_responses_to_user.add(response)
+            sent_responses_to_user[user_id].add(response)
             # now, sleep for the specified interval
             time.sleep(tweet_interval)
         # great. all users have been addressed

@@ -24,6 +24,8 @@ import time
 # import the sentiment analysis
 from sentiment_analyzer import SentimentAnalyzer
 from sentiment_classification import SentimentClassification
+# we need to convert a dictionary to a json string
+import json
 
 
 # OK. We will store every incoming tweet (excluding those that are RTs and such) in the raw data json
@@ -64,14 +66,14 @@ total_frequency = 0
 # The main function, taking control of everything
 def main():
     # do some setup
-    setup()
+    set_up()
     # we will have two threads.
     # one will be the streamer thread, which continuously gathers tweets from the users, and outputs them to the raw file
     # the streamer also analyzes the tweet text for sentiment, and increases the appropriate tally
     # the other thread will be a day-long loop, which stores the information in the running tallies in the processed data file
     # it then resets the tallies
     streamer_thread = Thread(target = tweet_streamer)
-    process_data_thread = Thread(target = process_data_thread)
+    process_data_thread = Thread(target = process_data_loop)
     # start the threads
     streamer_thread.start()
     process_data_thread.start()
@@ -132,7 +134,7 @@ def tweet_streamer():
 
             try:
                 # reinitialize the streamer object
-                streamer_object = TweetStreamer(setup.MEASURING_BACKUP_CONSUMER_KEY, setup.MEASURING_BACKUP_CONSUMER_SECRET, setup.MEASURING_BACKUP_ACCESS_TOKEN, setup.MEASURINGBACKUP_ACCESS_TOKEN_SECRET)
+                streamer_object = TweetStreamer(setup.MEASURING_BACKUP_CONSUMER_KEY, setup.MEASURING_BACKUP_CONSUMER_SECRET, setup.MEASURING_BACKUP_ACCESS_TOKEN, setup.MEASURING_BACKUP_ACCESS_TOKEN_SECRET)
                 # for error logs
                 streamer_object.arvid220u_error_title = "measure.py > tweet_streamer()"
                 # add the observer (the new_mention method)
@@ -168,6 +170,11 @@ def tweet_streamer():
 # this method is called once for every new tweet from the streamer
 def new_tweet(tweet):
     global sentiment_analyzer
+    global offensive_frequency
+    global neutral_frequency
+    global kind_frequency
+    global combined_score
+    global total_frequency
     print("new tweet")
     # simply print this tweet's json string to the raw data (along with an appended comma)
     # also analyze it for sentiment, and increment the appropriate day tallies
@@ -193,6 +200,11 @@ def new_tweet(tweet):
 
 # a 24-hour-long loop collecting the data
 def process_data_loop():
+    global offensive_frequency
+    global neutral_frequency
+    global kind_frequency
+    global combined_score
+    global total_frequency
     # this loop should run continuously, until the self destruct flag is set
     # the last recorded time
     last_time = datetime.utcnow()
@@ -218,7 +230,7 @@ def process_data_loop():
 
 
 
-def setup():
+def set_up():
     # before doing anything else, initialize the sentiment analyzer
     global sentiment_analyzer
     sentiment_analyzer = SentimentAnalyzer()
