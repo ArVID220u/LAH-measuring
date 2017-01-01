@@ -208,7 +208,7 @@ def score_user(user_id):
             print("prob sum: " + str(prob_sum))
             print("hate speech prob: " + str(hate_speech_prob))
             print("offensive prob: " + str(offensive_prob))
-            if prob_sum * random.random() <= hateful_prob:
+            if prob_sum * random.random() <= hate_speech_prob:
                 print("a hate speech tweet")
                 weighted_number_of_hateful_tweets += 2
             elif (prob_sum - hate_speech_prob) * random.random() <= offensive_prob:
@@ -251,7 +251,7 @@ def new_tweet(tweet):
     # make sure the tweeter is english-speaking, or the classification won't work
     if tweet["user"]["lang"] != "en":
         return
-    if sentiment_analyzer.analyze_tweet_verdict(tweet["text"]) == SentimentClassification.Hateful:
+    if sentiment_analyzer.analyze_tweet_verdict(tweet["text"]) != SentimentClassification.not_offensive:
         score_user(tweet["user"]["id"])
 
 
