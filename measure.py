@@ -122,7 +122,9 @@ def tweet_streamer():
             if self_destruction_flag:
                 break
             # check if error is incomplete read; then just continue
-            if exception == "('Connection broken: IncompleteRead(0 bytes read, 1 more expected)', IncompleteRead(0 bytes read, 1 more expected))":
+            if str(exception) == "('Connection broken: IncompleteRead(0 bytes read, 1 more expected)', IncompleteRead(0 bytes read, 1 more expected))":
+                continue
+            if str(exception) == "('Connection broken: IncompleteRead(0 bytes read, 2 more expected)', IncompleteRead(0 bytes read, 2 more expected))":
                 continue
             # oh no! an error occurred
             # this is not good. not good at all. we don't want the measuring process to have a hole in it

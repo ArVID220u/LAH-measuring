@@ -126,6 +126,9 @@ def setup_streamer():
             if str(exception) == "('Connection broken: IncompleteRead(0 bytes read, 1 more expected)', IncompleteRead(0 bytes read, 1 more expected))":
                 print("restarting")
                 continue
+            if str(exception) == "('Connection broken: IncompleteRead(0 bytes read, 2 more expected)', IncompleteRead(0 bytes read, 2 more expected))":
+                print("restarting")
+                continue
             error_messenger.send_error_message(exception, "find_users.py > setup_streamer()")
             print("not restarting, rather just saving the currently gathered user ids")
             print("before reinstating the process, please check so that the user_ids file is not corrupt")
