@@ -123,10 +123,13 @@ def setup_streamer():
                 break
             save_user_ids()
             # if incomplete read, just continue
-            if str(exception) == "('Connection broken: IncompleteRead(0 bytes read, 1 more expected)', IncompleteRead(0 bytes read, 1 more expected))":
+            """if str(exception) == "('Connection broken: IncompleteRead(0 bytes read, 1 more expected)', IncompleteRead(0 bytes read, 1 more expected))":
                 print("restarting")
                 continue
             if str(exception) == "('Connection broken: IncompleteRead(0 bytes read, 2 more expected)', IncompleteRead(0 bytes read, 2 more expected))":
+                print("restarting")
+                continue"""
+            if str(exception).startswith("('Connection broken: IncompleteRead"):
                 print("restarting")
                 continue
             error_messenger.send_error_message(exception, "find_users.py > setup_streamer()")

@@ -153,9 +153,12 @@ def mentions_streamer():
             if self_destruction_flag:
                 break
             # check if exception is incomplete read: then, just restart immediately
-            if str(exception) == "('Connection broken: IncompleteRead(0 bytes read, 1 more expected)', IncompleteRead(0 bytes read, 1 more expected))":
+            """if str(exception) == "('Connection broken: IncompleteRead(0 bytes read, 1 more expected)', IncompleteRead(0 bytes read, 1 more expected))":
                 continue
             if str(exception) == "('Connection broken: IncompleteRead(0 bytes read, 2 more expected)', IncompleteRead(0 bytes read, 2 more expected))":
+                continue"""
+            if str(exception).startswith("('Connection broken: IncompleteRead"):
+                print("restarting")
                 continue
             # print the exception and then sleep for an hour,
             # and hope that the problem will resolve itself, magically
