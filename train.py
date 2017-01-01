@@ -29,7 +29,7 @@ def main():
             streamer.statuses.filter(track=setup.TRAIN_PHRASE, language=setup.LANGUAGE)
         except Exception as exception:
             print(exception)
-            if exception == "('Connection broken: IncompleteRead(0 bytes read, 1 more expected)', IncompleteRead(0 bytes read, 1 more expected))":
+            if str(exception) == "('Connection broken: IncompleteRead(0 bytes read, 1 more expected)', IncompleteRead(0 bytes read, 1 more expected))":
                 continue
             else:
                 break
