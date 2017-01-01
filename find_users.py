@@ -189,27 +189,35 @@ def score_user(user_id):
     mean_hatefulness_score = 0
     num_simulations = 500
     for i in range(1,num_simulations):
-        number_of_hateful_tweets = 0
+        # the weighted number of hateful tweets: hate speech tweets increase the value by 2, and offensive tweets increase it by 1
+        weighted_number_of_hateful_tweets = 0
         for prob_distribution in probability_distributions:
             # The sum of all probabilities
             prob_sum = 0
-            hateful_prob = 0
+            hate_speech_prob = 0
+            offensive_prob = 0
             for label in prob_distribution:
                 prob_sum += prob_distribution[label]
                 print("prob dist for label " + label + ": " + str(prob_distribution[label]))
-                if label == SentimentClassification.Hateful:
-                    hateful_prob = prob_distribution[label]
+                if label == SentimentClassification.hate_speech:
+                    hate_speech_prob = prob_distribution[label]
+                elif label == SentimentClassification.offensive_but_not_hate_speech:
+                    offensive_prob = prob_distribution[label]
             # check if the classification is hateful, based on randomly generated numbers within the probability range
             # recall that random.random() returns a random number between 0 and 1
             print("prob sum: " + str(prob_sum))
-            print("hateful prob: " + str(hateful_prob))
+            print("hate speech prob: " + str(hate_speech_prob))
+            print("offensive prob: " + str(offensive_prob))
             if prob_sum * random.random() <= hateful_prob:
-                print("a hateful tweet")
-                number_of_hateful_tweets += 1
+                print("a hate speech tweet")
+                weighted_number_of_hateful_tweets += 2
+            elif (prob_sum - hate_speech_prob) * random.random() <= offensive_prob:
+                print("an offensive but not hate speech tweet")
+                weighted_number_of_hateful_tweets += 1
         # add this to the hatefulness score
-        mean_hatefulness_score += number_of_hateful_tweets / len(probability_distributions)
+        mean_hatefulness_score += weighted_number_of_hateful_tweets / len(probability_distributions)
     print("hatefulness sum (to be divided by 500): " + str(mean_hatefulness_score))
-    # make the sum a mean
+    # make the sum a mean. it can be greater than 1
     mean_hatefulness_score /= num_simulations
 
     # 4. Get the minimum element in user_ids, along with its index, and add this user if needed

@@ -56,9 +56,10 @@ user_ids = []
 
 
 # the data, resetted each day
-offensive_frequency = 0
-neutral_frequency = 0
-kind_frequency = 0
+hate_speech_frequency = 0
+offensive_but_not_hate_speech_frequency = 0
+not_offensive_frequency = 0
+# the combined score increases by 2 when a hate speech tweet is encountered, and by 1 when an only offensive tweet is found
 combined_score = 0
 total_frequency = 0
 
@@ -170,9 +171,9 @@ def tweet_streamer():
 # this method is called once for every new tweet from the streamer
 def new_tweet(tweet):
     global sentiment_analyzer
-    global offensive_frequency
-    global neutral_frequency
-    global kind_frequency
+    global hate_speech_frequency
+    global offensive_but_not_hate_speech_frequency
+    global not_offensive_frequency
     global combined_score
     global total_frequency
     print("new tweet")
@@ -187,22 +188,22 @@ def new_tweet(tweet):
     # increment the total tally
     total_frequency += 1
     # update the respective frequency
-    if sentiment_verdict == SentimentClassification.Hateful:
-        offensive_frequency += 1
-        combined_score -= 1
-    elif sentiment_verdict == SentimentClassification.Neutral:
-        neutral_frequency += 1
-    elif sentiment_verdict == SentimentClassification.Kind:
-        kind_frequency += 1
+    if sentiment_verdict == SentimentClassification.hate_speech:
+        hate_speech_frequency += 1
+        combined_score += 2
+    elif sentiment_verdict == SentimentClassification.offensive_but_not_hate_speech:
+        offensive_but_not_hate_speech_frequency += 1
         combined_score += 1
+    elif sentiment_verdict == SentimentClassification.not_offensive:
+        not_offensive_frequency += 1
 
 
 
 # a 24-hour-long loop collecting the data
 def process_data_loop():
-    global offensive_frequency
-    global neutral_frequency
-    global kind_frequency
+    global hate_speech_frequency
+    global offensive_but_not_hate_speech_frequency
+    global not_offensive_frequency
     global combined_score
     global total_frequency
     # this loop should run continuously, until the self destruct flag is set
@@ -217,12 +218,12 @@ def process_data_loop():
         # write the current variables to the processed file
         with open(setup.PROCESSED_DATA_PATH, "a") as processed_file:
             processed_file.write(str(next_time) + ",")
-            processed_file.write(str(offensive_frequency) + "," + str(neutral_frequency) + "," + str(kind_frequency) + "," + str(combined_score) + "," + str(total_frequency))
+            processed_file.write(str(hate_speech_frequency) + "," + str(offensive_but_not_hate_speech_frequency) + "," + str(not_offensive_frequency) + "," + str(combined_score) + "," + str(total_frequency))
             processed_file.write("\n")
         # reset the variables
-        offensive_frequency = 0
-        neutral_frequency = 0
-        kind_frequency = 0
+        hate_speech_frequency = 0
+        offensive_but_not_hate_speech_frequency = 0
+        not_offensive_frequency = 0
         combined_score = 0
         total_frequency = 0
         # last time is next time
@@ -251,7 +252,7 @@ def set_up():
         raw_file.write("[")
     # the processed data file should be a csv file
     with open(setup.PROCESSED_DATA_PATH, "w") as processed_file:
-        processed_file.write("Date,Offensive Tally,Neutral Tally,Kind Tally,Combined Score,Total Tally\n")
+        processed_file.write("Date,Hate Speech Tally,Offensive But Not Hate Speech Tally,Not Offensive Tally,Combined Score,Total Tally\n")
     # load the user ids
     global user_ids
     with open(setup.USER_IDS_PATH, "r") as user_ids_file:
