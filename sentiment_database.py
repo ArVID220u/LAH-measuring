@@ -43,6 +43,8 @@ def get_hate_tweets():
         raw_tweet_text = tweet_dict["fields"]["tweet_text"]
         # the text may need processing. I don't know if special characters are presented properly (like emojis – they are important)
         # for now, though, just copy the raw_tweet_text directly
+        # after thorough investigation, it seems the tweet texts are beyond repair. And the tweet ids are not stored properly.
+        # So I guess there's nothing to do, except acknowledging that the data was created by an amateur, and go on with life
         tweet_text = raw_tweet_text
         # the classification
         # it will be one of the three sentences:
