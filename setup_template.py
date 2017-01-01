@@ -35,6 +35,13 @@ RESPONSE_SUFFIX = " ❤️"
 
 
 
+# SENTIMENT ANALYSIS
+
+# The path to the file containing the corpus of classified tweets, in json formatting
+CLASSIFIED_CORPUS_PATH = "hate_speech_corpus.json"
+
+
+
 # MEASURING
 
 # The path to the file containing the json objects of the collected tweets
