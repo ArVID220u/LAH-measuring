@@ -200,7 +200,7 @@ def new_mention(tweet):
     # first check so that the user actually did mention the bot
     did_mention = False
     for user_mention in tweet["entities"]["user_mentions"]:
-        if user_mentions["screen_name"] == setup.TWITTER_USERNAME:
+        if user_mention["screen_name"] == setup.TWITTER_USERNAME:
             did_mention = True
     if not did_mention:
         # return early if no mention
