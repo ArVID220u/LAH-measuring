@@ -216,7 +216,7 @@ def score_user(user_id):
             print("offensive prob: " + str(offensive_prob))
             if prob_sum * random.random() <= hate_speech_prob:
                 print("a hate speech tweet")
-                weighted_number_of_hateful_tweets += 2
+                weighted_number_of_hateful_tweets += 3
             elif (prob_sum - hate_speech_prob) * random.random() <= offensive_prob:
                 print("an offensive but not hate speech tweet")
                 weighted_number_of_hateful_tweets += 1
@@ -235,7 +235,7 @@ def score_user(user_id):
         return
     # get the min index
     min_index = 0
-    min_hatefulness_score = 2
+    min_hatefulness_score = 1000
     for index, (some_user_id, some_hatefulness_score) in enumerate(user_ids):
         if some_hatefulness_score < min_hatefulness_score:
             min_index = index
