@@ -56,7 +56,7 @@ self_destruction_flag = False
 
 
 # we need the mentions streamer as a global, so as to be able to disconnect it gracefully at self destruction
-mentions_streamer = None
+mentions_streamer_object = None
 
 
 
@@ -82,8 +82,8 @@ def self_destruct():
     global self_destruction_flag
     self_destruction_flag = True
     # Then, disconnect the mentions streamer
-    global mentions_streamer
-    mentions_streamer.disconnect()
+    global mentions_streamer_object
+    mentions_streamer_object.disconnect()
 
 
 
@@ -103,6 +103,9 @@ def set_up():
 
     # find the screen name for every user id
     global screen_name_for_user_id
+    # if we can't get the screen name, then something's wrong
+    # add that user to the remove queue
+    remove_list = []
     for user_id in user_ids:
         # use the mentions app for checking up the user
         # this is since it is less critical than the tweeting app, while having the same privileges
@@ -111,8 +114,17 @@ def set_up():
         while twythonaccess.currently_rate_limited(TwitterApp.mentions, 900):
             time.sleep(60)
         # get the screen name of the user
-        screen_name = twythonaccess.authorize(TwitterApp.mentions).show_user(user_id = user_id)["screen_name"]
-        screen_name_for_user_id[user_id] = screen_name
+        try:
+            screen_name = twythonaccess.authorize(TwitterApp.mentions).show_user(user_id = user_id)["screen_name"]
+            screen_name_for_user_id[user_id] = screen_name
+        except Exception as exception:
+            # can't find screen name of this user
+            print(exception)
+            remove_list.append(user_id)
+            print("Can't find screen name of user with id: " + str(user_id))
+    error_messenger.send_error_message("Removing " + str(len(remove_list)) + " users due to inability to get their screen name.", "tweet.py > set_up()")
+    for user_id in remove_list:
+        user_ids.remove(user_id)
 
     # create the dictionary of empty sets per each user id
     global sent_responses_to_user
@@ -135,19 +147,19 @@ def mentions_streamer():
     print("mentions streamer")
     # initialize the mentions streamer
     # use the mentions app
-    global mentions_streamer
-    mentions_streamer = TweetStreamer(setup.MENTIONS_CONSUMER_KEY, setup.MENTIONS_CONSUMER_SECRET, setup.MENTIONS_ACCESS_TOKEN, setup.MENTIONS_ACCESS_TOKEN_SECRET)
+    global mentions_streamer_object
+    mentions_streamer_object = TweetStreamer(setup.MENTIONS_CONSUMER_KEY, setup.MENTIONS_CONSUMER_SECRET, setup.MENTIONS_ACCESS_TOKEN, setup.MENTIONS_ACCESS_TOKEN_SECRET)
     # for error logs
-    mentions_streamer.arvid220u_error_title = "tweet.py > mentions_streamer()"
+    mentions_streamer_object.arvid220u_error_title = "tweet.py > mentions_streamer()"
     # add the observer (the new_mention method)
-    mentions_streamer.arvid220u_add_observer(new_mention)
+    mentions_streamer_object.arvid220u_add_observer(new_mention)
     # start streaming
     # wrap it in error handling
     while not self_destruction_flag:
         try:
             # RTs will automatically be discarded (default setting)
             # check for tweets referencing self
-            mentions_streamer.statuses.filter(track=("@" + setup.TWITTER_USERNAME))
+            mentions_streamer_object.statuses.filter(track=("@" + setup.TWITTER_USERNAME))
         except Exception as exception:
             # If self destruction flag is true, then continue (same as break)
             if self_destruction_flag:
