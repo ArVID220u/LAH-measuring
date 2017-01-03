@@ -8,5 +8,8 @@ user_ids.txt
 raw_data.json
 processed_data.csv
 
+# screen
+screenlog.*
+
 # For vim
 *.s[a-w][a-z]
