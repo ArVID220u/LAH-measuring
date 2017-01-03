@@ -215,8 +215,8 @@ def process_data_loop():
     # the last recorded time
     last_time = datetime.utcnow()
     while not self_destruction_flag:
-        # start with a sleep, until exactly 4 hours has passed since the last_time
-        next_time = last_time + timedelta(seconds = 4*60*60)
+        # start with a sleep, until exactly 2 hours has passed since the last_time
+        next_time = last_time + timedelta(seconds = 2*60*60)
         time.sleep((next_time - datetime.utcnow()).total_seconds())
         if self_destruction_flag:
             break
