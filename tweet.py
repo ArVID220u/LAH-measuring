@@ -196,6 +196,18 @@ def new_mention(tweet):
     # if the self desturction flag is on, then return immediately
     if self_destruction_flag:
         return
+
+    # first check so that the user actually did mention the bot
+    did_mention = False
+    for user_mention in tweet["entities"]["user_mentions"]:
+        if user_mentions["screen_name"] == setup.TWITTER_USERNAME:
+            did_mention = True
+    if not did_mention:
+        # return early if no mention
+        # it's strange that this can happen
+        return
+
+
     # hmm... Should it be possible for a user to be replied to many times, or should there be a limit on the number of responses per user?
     # This is interesting, though I'm not sure whether I know the perfect strategy.
     # Perhaps, the best way to go is to only reply once in a specified time range (say 1 day), instead of having it applied for all time
@@ -216,14 +228,7 @@ def new_mention(tweet):
 
     # first check if the mentions app is currently rate limited, to later get its screen name
     # if it is rate limited, return silently, so as not to build up a queue here
-    # Twitter allows 900 user shows per 15 minute window
-    # However, sending the tweet is rate limited by 15 per 15 minute window
-    # And since we need to send two requests in sending one tweet, the limit needs to be 14 here
-    if twythonaccess.currently_rate_limited(TwitterApp.mentions, 14):
-        # simply return silently
-        return
-    # get the screen name of the user to reply to
-    reply_to_screen_name = twythonaccess.authorize(TwitterApp.mentions).show_user(user_id = user_id)["screen_name"]
+    reply_to_screen_name = tweet["user"]["screen_name"]
     # create the tweet
     reply_tweet = "@" + reply_to_screen_name + " " + setup.REPLY_TWEET
     # send the tweet, and check whether it was actually sent
