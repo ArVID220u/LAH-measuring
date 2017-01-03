@@ -217,7 +217,9 @@ def new_mention(tweet):
     # first check if the mentions app is currently rate limited, to later get its screen name
     # if it is rate limited, return silently, so as not to build up a queue here
     # Twitter allows 900 user shows per 15 minute window
-    if twythonaccess.currently_rate_limited(TwitterApp.mentions, 900):
+    # However, sending the tweet is rate limited by 15 per 15 minute window
+    # And since we need to send two requests in sending one tweet, the limit needs to be 14 here
+    if twythonaccess.currently_rate_limited(TwitterApp.mentions, 14):
         # simply return silently
         return
     # get the screen name of the user to reply to
