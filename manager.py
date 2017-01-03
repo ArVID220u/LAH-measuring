@@ -40,12 +40,12 @@ def main():
     # 30 days later, we have the tweet start time
     # Another 30 days later, we have the tweet end time
     # And, finally, another 30 days, and we have the (global) end time
-    # TESTING: ONLY 1.5 DAYS, INSTEAD OF 30 DAYS
+    # TESTING: ONLY 0.3 DAYS, INSTEAD OF 30 DAYS
     now_time = datetime.utcnow()
     start_time = datetime.combine(now_time.date(), time(now_time.hour + 1, 0))
-    tweet_start_time = start_time + timedelta(days = 1.5)
-    tweet_end_time = tweet_start_time + timedelta(days = 1.5)
-    end_time = tweet_end_time + timedelta(days = 1.5)
+    tweet_start_time = start_time + timedelta(days = 0.3)
+    tweet_end_time = tweet_start_time + timedelta(days = 0.3)
+    end_time = tweet_end_time + timedelta(days = 0.3)
 
     print("INFORMATION")
     print("Will start at " + str(start_time) + " (UTC).")
@@ -54,7 +54,8 @@ def main():
     error_messenger.send_error_message("Will end at " + str(end_time) + " (UTC).", "manager.py")
 
     # sleep until the start time
-    sleep((start_time - datetime.utcnow()).total_seconds())
+    # TEST: START IMMEDIATELY
+    #sleep((start_time - datetime.utcnow()).total_seconds())
 
     # start the measure thread
     measure_thread.start()
