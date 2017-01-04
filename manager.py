@@ -41,7 +41,7 @@ def main():
     # Another 30 days later, we have the tweet end time
     # And, finally, another 30 days, and we have the (global) end time
     now_time = datetime.utcnow()
-    start_time = datetime.combine(now_time.date(), time(now_time.hour + 1, 0))
+    start_time = datetime.combine(now_time.date(), time((now_time.hour + 1) % 24, 0))
     tweet_start_time = start_time + timedelta(days = 30)
     tweet_end_time = tweet_start_time + timedelta(days = 30)
     end_time = tweet_end_time + timedelta(days = 30)
